@@ -8,7 +8,10 @@ import ConnectPro.com.model.User;
 import ConnectPro.com.model.UserType;
 import ConnectPro.com.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -58,5 +61,29 @@ public class UserController {
                 user.getEmail(),
                 user.getCreatedAt()
         );
+    }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id) {
+        userService.deleteUser(id);
+    }
+    @GetMapping("/username/{username}")
+    public UserResponseDTO findByUsername(@PathVariable String username) {
+
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return new UserResponseDTO(
+                user.getId(),
+                user.getUserType(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt()
+        );
+    }
+    @GetMapping
+    public List<UserResponseDTO> findAll() {
+        return userService.findAllUsers().stream().map(user -> new UserResponseDTO
+                (user.getId(), user.getUserType(), user.getUsername(), user.getEmail(), user.getCreatedAt())).toList();
     }
 }

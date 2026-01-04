@@ -42,7 +42,6 @@ public class UserServiceImpl implements UserService {
                     throw new IllegalArgumentException("Email already exists");
                 });
 
-        // ⚠️ Senha SEM criptografia (dev only)
         return userRepository.save(user);
     }
 
