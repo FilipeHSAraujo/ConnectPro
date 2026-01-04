@@ -6,8 +6,6 @@ import ConnectPro.com.model.UserType;
 import ConnectPro.com.repository.UserRepository;
 import ConnectPro.com.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,13 +18,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository,
-                           PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -34,7 +28,7 @@ public class UserServiceImpl implements UserService {
         Objects.requireNonNull(user, "User cannot be null");
 
         requireNonBlank(user.getUsername(), "Username is required");
-        requireNonBlank(user.getEmail(),    "Email is required");
+        requireNonBlank(user.getEmail(), "Email is required");
         requireNonBlank(user.getPassword(), "Password is required");
         Objects.requireNonNull(user.getUserType(), "User type is required");
 
@@ -43,13 +37,12 @@ public class UserServiceImpl implements UserService {
                     throw new IllegalArgumentException("Username already exists");
                 });
 
-
         userRepository.findByEmail(user.getEmail())
                 .ifPresent(u -> {
-                    throw new IllegalArgumentException("Email already exists");});
+                    throw new IllegalArgumentException("Email already exists");
+                });
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        // ⚠️ Senha SEM criptografia (dev only)
         return userRepository.save(user);
     }
 
@@ -80,7 +73,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found");
+            throw new EntityNotFoundException("User not found");
         }
         userRepository.deleteById(id);
     }
@@ -92,7 +85,9 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() ->
+                        new EntityNotFoundException("User not found with id: " + userId)
+                );
 
         UserType userType = user.getUserType();
         if (userType == null) {
@@ -103,7 +98,6 @@ public class UserServiceImpl implements UserService {
             case ADMIN      -> true;
             case CLIENT     -> action == UserAction.POST_JOB || action == UserAction.VIEW_PROFILE;
             case FREELANCER -> action == UserAction.APPLY_JOB || action == UserAction.VIEW_PROFILE;
-            default         -> false;
         };
     }
 }

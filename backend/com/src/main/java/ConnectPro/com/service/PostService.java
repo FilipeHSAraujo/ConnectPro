@@ -1,8 +1,9 @@
 package ConnectPro.com.service;
 
 import ConnectPro.com.model.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface PostService {
@@ -11,10 +12,10 @@ public interface PostService {
 
     Optional<Post> findPostById(Long id);
 
-    List<Post> findAllPosts();
+    Page<Post> findAllPosts(Pageable pageable);
 
-    List<Post> findPostByUser(Long userId);
+    Page<Post> findPostByUser(Long userId, Pageable pageable);
 
     void deletePost(Long id);
-
 }
+

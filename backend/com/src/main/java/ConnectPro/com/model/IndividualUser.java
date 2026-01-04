@@ -9,7 +9,17 @@ import jakarta.persistence.Table;
 @DiscriminatorValue("INDIVIDUAL")
 public class IndividualUser extends User {
 
-    // Ssn e como cpf
-    @Column(nullable = false, unique = true, length = 9)
+    @Column(unique = true, length = 9)
     private String ssn;
+
+    public IndividualUser() {
+    }
+
+    public String getSsn() {
+        return ssn;
+    }
+
+    public void setSsn(String ssn) {
+        this.ssn = ssn;
+    }
 }

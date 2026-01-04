@@ -1,12 +1,14 @@
 package ConnectPro.com.controller;
 
+import ConnectPro.com.dto.UserRequestDTO;
+import ConnectPro.com.dto.UserResponseDTO;
+import ConnectPro.com.model.CompanyUser;
+import ConnectPro.com.model.IndividualUser;
 import ConnectPro.com.model.User;
+import ConnectPro.com.model.UserType;
 import ConnectPro.com.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -14,35 +16,47 @@ public class UserController {
 
     private final UserService userService;
 
-    @Autowired
-    public UserController(UserService userService){
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public User registerUser(@RequestBody User user){
-        return userService.registerUser(user);
+    public UserResponseDTO registerUser(@RequestBody @Valid UserRequestDTO dto) {
+
+        User user = switch (dto.userType()) {
+            case ADMIN, FREELANCER -> new IndividualUser();
+            case CLIENT -> new CompanyUser();
+        };
+
+
+        user.setUserType(dto.userType());
+        user.setUsername(dto.username());
+        user.setEmail(dto.email());
+        user.setPassword(dto.password());
+
+        User saved = userService.registerUser(user);
+
+        return new UserResponseDTO(
+                saved.getId(),
+                saved.getUserType(),
+                saved.getUsername(),
+                saved.getEmail(),
+                saved.getCreatedAt()
+        );
     }
 
     @GetMapping("/{id}")
-    public User findUserById(@PathVariable Long id){
-        return userService.findUserById(id).orElseThrow(() ->  new RuntimeException("User not found"));
-    }
+    public UserResponseDTO findById(@PathVariable Long id) {
 
-    @GetMapping("/username/{username}")
-    public User findUserByUsername(@PathVariable String username){
-        return userService.findUserByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-    }
+        User user = userService.findUserById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    @GetMapping
-    public List <User> findAllUsers() {
-        return userService.findAllUsers();
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable Long id){
-        userService.deleteUser(id);
+        return new UserResponseDTO(
+                user.getId(),
+                user.getUserType(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt()
+        );
     }
 }

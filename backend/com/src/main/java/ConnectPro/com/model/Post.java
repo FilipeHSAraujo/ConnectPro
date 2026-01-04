@@ -25,6 +25,10 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+
+    public Post() {
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
