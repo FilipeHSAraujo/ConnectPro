@@ -1,9 +1,15 @@
 package ConnectPro.com.controller;
+import ConnectPro.com.service.PostService;
 
+import ConnectPro.com.dto.PostRequestDTO;
+import ConnectPro.com.dto.PostResponseDTO;
 import ConnectPro.com.model.User;
 import ConnectPro.com.service.UserService;
+import ConnectPro.com.service.impl.PostServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,10 +19,11 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final PostService postService;
 
     @Autowired
-    public UserController(UserService userService){
-        this.userService = userService;
+    public UserController(UserService userService,PostService postService){
+        this.userService = userService;this.postService = postService;
     }
 
     @PostMapping
@@ -45,4 +52,13 @@ public class UserController {
     public void deleteUser(@PathVariable Long id){
         userService.deleteUser(id);
     }
+
+    @PostMapping
+    public PostResponseDTO createPost(
+            @Valid @RequestBody PostRequestDTO dto,
+            Authentication authentication
+    ) {
+        return postService.create(dto, authentication.getName());
+    }
+
 }

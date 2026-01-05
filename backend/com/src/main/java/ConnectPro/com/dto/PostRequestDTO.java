@@ -1,17 +1,14 @@
 package ConnectPro.com.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class PostRequestDTO {
-    private String title;
+
+
+
+    @NotBlank
     private String content;
-    private Long userId; // ποιος δημιούργησε το post
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public String getContent() {
         return content;
@@ -19,13 +16,5 @@ public class PostRequestDTO {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 }
