@@ -1,20 +1,43 @@
 package ConnectPro.com.service;
 
 import ConnectPro.com.model.Post;
+import ConnectPro.com.repository.PostRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface PostService {
+@Service
+public class PostService {
 
-    Post createPost(Post post, Long userId);
+    private final PostRepository postRepository;
 
-    Optional<Post> findPostById(Long id);
+    public PostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
-    List<Post> findAllPosts();
+    public Post createPost(Post post) {
+        return postRepository.save(post);
+    }
 
-    List<Post> findPostByUser(Long userId);
+    public Post getPostById(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+    }
 
-    void deletePost(Long id);
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
 
+    public Post updatePost(Long id, String content) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        post.setContent(content);
+        return postRepository.save(post);
+    }
+
+    public void deletePost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        postRepository.delete(post);
+    }
 }
