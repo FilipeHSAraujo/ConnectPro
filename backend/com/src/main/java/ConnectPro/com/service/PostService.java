@@ -1,10 +1,17 @@
 package ConnectPro.com.service;
 
 import ConnectPro.com.model.Post;
+<<<<<<< HEAD
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Optional;
+=======
 import ConnectPro.com.repository.PostRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+>>>>>>> main
 
 @Service
 public class PostService {
@@ -15,6 +22,13 @@ public class PostService {
         this.postRepository = postRepository;
     }
 
+<<<<<<< HEAD
+    Page<Post> findAllPosts(Pageable pageable);
+
+    Page<Post> findPostByUser(Long userId, Pageable pageable);
+
+    void deletePost(Long id);
+=======
     public Post createPost(Post post) {
         return postRepository.save(post);
     }
@@ -40,4 +54,6 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         postRepository.delete(post);
     }
+>>>>>>> main
 }
+

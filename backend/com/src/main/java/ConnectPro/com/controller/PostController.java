@@ -1,5 +1,8 @@
 package ConnectPro.com.controller;
 
+<<<<<<< HEAD
+public class PostController {
+=======
 import ConnectPro.com.model.Post;
 import ConnectPro.com.model.User;
 import ConnectPro.com.repository.UserRepository;
@@ -55,4 +58,5 @@ public class PostController {
     public void deletePost(@PathVariable Long id) {
         postService.deletePost(id);
     }
+>>>>>>> main
 }
