@@ -1,62 +1,66 @@
 package ConnectPro.com.controller;
 
-<<<<<<< HEAD
-public class PostController {
-=======
-import ConnectPro.com.model.Post;
-import ConnectPro.com.model.User;
-import ConnectPro.com.repository.UserRepository;
+import ConnectPro.com.dto.PostRequestDTO;
+import ConnectPro.com.dto.PostResponseDTO;
+import ConnectPro.com.dto.PostMapper;
 import ConnectPro.com.service.PostService;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
-    private final UserRepository userRepository;
 
-    public PostController(PostService postService, UserRepository userRepository) {
+    public PostController(PostService postService) {
         this.postService = postService;
-        this.userRepository = userRepository;
     }
 
-    // Create a post
+    // CREATE
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Post createPost(@RequestBody Post postRequest) {
-        User user = userRepository.findById(postRequest.getAuthor().getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        postRequest.setAuthor(user);
-        return postService.createPost(postRequest);
+    public PostResponseDTO createPost(
+            @RequestBody @Valid PostRequestDTO dto
+    ) {
+        return PostMapper.toDTO(
+                postService.createPost(PostMapper.toEntity(dto),dto.authorId())
+        );
     }
 
-    // Get a post by ID
+    // READ ONE
     @GetMapping("/{id}")
-    public Post getPostById(@PathVariable Long id) {
-        return postService.getPostById(id);
+    public PostResponseDTO getPostById(@PathVariable Long id) {
+        return PostMapper.toDTO(
+                postService.getPostById(id)
+        );
     }
 
-    // Get all posts
+    // READ ALL
     @GetMapping
-    public List<Post> getAllPosts() {
-        return postService.getAllPosts();
+    public Page<PostResponseDTO> getAllPosts(Pageable pageable) {
+        return postService.findAllPosts(pageable)
+                .map(PostMapper::toDTO);
     }
 
-    // Update a post
+    // UPDATE
     @PutMapping("/{id}")
-    public Post updatePost(@PathVariable Long id, @RequestBody Post postRequest) {
-        return postService.updatePost(id, postRequest.getContent());
+    public PostResponseDTO updatePost(
+            @PathVariable Long id,
+            @RequestBody @Valid PostRequestDTO dto
+    ) {
+        return PostMapper.toDTO(
+                postService.updatePost(id, dto.content())
+        );
     }
 
-    // Delete a post
+    // DELETE
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePost(@PathVariable Long id) {
         postService.deletePost(id);
     }
->>>>>>> main
 }

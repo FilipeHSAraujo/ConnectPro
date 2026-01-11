@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -32,23 +31,13 @@ public class PostServiceImpl implements PostService {
         Objects.requireNonNull(post, "Post cannot be null");
         Objects.requireNonNull(userId, "UserId cannot be null");
 
-        if (post.getContent() == null || post.getContent().isBlank()) {
-            throw new IllegalArgumentException("Post content is required");
-        }
-
-        User author = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() ->
                         new EntityNotFoundException("User not found with id: " + userId)
                 );
 
-        post.setAuthor(author);
+        post.setAuthor(user);
         return postRepository.save(post);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Post> findPostById(Long id) {
-        return postRepository.findById(id);
     }
 
     @Override
@@ -71,8 +60,30 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePost(Long id) {
         if (!postRepository.existsById(id)) {
-            throw new EntityNotFoundException("Post not found");
+            throw new EntityNotFoundException("Post not found with id: " + id);
         }
         postRepository.deleteById(id);
+    }
+
+    @Override
+    public Post updatePost(Long id, String content) {
+        Objects.requireNonNull(content, "Content cannot be null");
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Post not found with id: " + id)
+                );
+
+        post.setContent(content);
+        return postRepository.save(post);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Post getPostById(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Post not found with id: " + id)
+                );
     }
 }
